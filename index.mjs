@@ -1,4 +1,4 @@
-import { userPassAuth } from './node_modules/brume-web/node_modules/brume-auth/cognitoAuth.mjs';
+import { userPassAuth } from 'amazon-cognito-identity-js';
 import brumeStyleSheet from './common.css?stylesheet' assert { type: "css" };
 import { SpaNavCe } from './spa-nav.mjs';
 
