@@ -1,4 +1,4 @@
-import { userPassAuth } from 'amazon-cognito-identity-js';
+import { AuthenticationDetails, CognitoUser } from 'amazon-cognito-identity-js';
 import brumeStyleSheet from './common.css?stylesheet' assert { type: "css" };
 import { SpaNavCe } from './spa-nav.mjs';
 
@@ -68,7 +68,7 @@ class BrumeLoginCe extends HTMLElement {
 				localStorage.checkbox = "";
 			}
 
-			const result = await userPassAuth( this.#email.value, this.#password.value );
+			const result = await this.#userPassAuth( this.#email.value, this.#password.value );
 			if( result.error ) {
 				if( result.error == "NEW_PASSWORD_REQUIRED" ) {
 					alert( 'New Password Required. Change your password at brume.occams.solutions.' );
@@ -88,6 +88,24 @@ class BrumeLoginCe extends HTMLElement {
 			let password = shadowRoot.querySelector( `#${ event.target.attributes[ 'for' ].value }` ); //this.previousElementSibling;
 			password.type = password.type === "password" ? "text" : "password";
 			event.target.innerText = password.type === "password" ? "show" : "hide";
+		} );
+	}
+
+	#userPassAuth( username, password ) {
+		return new Promise( ( res, rej ) => {
+			const authenticationDetails = new AuthenticationDetails( { Username: username, Password: password } );
+			const cognitoUser = new CognitoUser( { Username: username, Pool: userPool } );
+
+			cognitoUser.authenticateUser( authenticationDetails, {
+				onSuccess: function( result ) {
+					cognitoUser.getUserAttributes( ( e, r ) => {
+						res( { IdToken: result.getIdToken().getJwtToken() } );
+					} );
+				},
+				onFailure: function( err ) {
+					res ( { error: err } );
+				}
+			} );
 		} );
 	}
 
