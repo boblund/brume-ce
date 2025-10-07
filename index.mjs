@@ -1,4 +1,4 @@
-import { AuthenticationDetails, CognitoUser } from 'amazon-cognito-identity-js';
+import { AuthenticationDetails, CognitoUserPool, CognitoUser } from 'amazon-cognito-identity-js';
 import brumeStyleSheet from './common.css?stylesheet' assert { type: "css" };
 import { SpaNavCe } from './spa-nav.mjs';
 
@@ -92,6 +92,7 @@ class BrumeLoginCe extends HTMLElement {
 	}
 
 	#userPassAuth( username, password ) {
+		const userPool = new CognitoUserPool( { UserPoolId: 'us-east-1_p5E3AsRc8', ClientId: '6dspdoqn9q00f0v42c12qvkh5l' } );
 		return new Promise( ( res, rej ) => {
 			const authenticationDetails = new AuthenticationDetails( { Username: username, Password: password } );
 			const cognitoUser = new CognitoUser( { Username: username, Pool: userPool } );
