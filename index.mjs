@@ -200,7 +200,7 @@ class DialogCe extends HTMLElement {
 			<style>
 					.dialog-container {
 						position: absolute;
-						top: 2vh;
+						top: 5vh;
 						left: 50%;
 						transform: translateX(-50%);
 						display: flex;
@@ -211,9 +211,9 @@ class DialogCe extends HTMLElement {
 					.dialog {
 						width: fit-content;
 						min-width: 10vw;
-						max-width: 60vw;
+						max-width: 20vw;
 						min-height: 4em;
-						padding: 0.5em 0.5em 0.5em 0.5em;
+						padding: 0.75em 0.75em 0.75em 0.75em;
 						border: 1px solid #ccc;
 						background: #fff;
 						box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
