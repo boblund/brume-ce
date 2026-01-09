@@ -14,7 +14,7 @@ class BrumeLoginCe extends HTMLElement {
 
 	constructor() {
 		super();
-		this.hidden = true;
+		//this.hidden = true;
 		this.attachShadow( { mode: 'open' } ).innerHTML = `
 			<style>
 				span[for="password"]:hover {
@@ -268,7 +268,6 @@ class DialogCe extends HTMLElement {
 		this.#OKBtn = this.shadowRoot.querySelector( "#OKBtn" );
 		this.#dialogMsg = this.shadowRoot.querySelector( "#dialogMsg" );
 		this.#input = this.shadowRoot.querySelector( "#prompt" );
-		console.log( `ce-dialog` );
 	}
 
 	#dialog( type, msg ){
