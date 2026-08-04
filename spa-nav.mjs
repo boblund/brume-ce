@@ -1,133 +1,62 @@
 export { SpaNavCe };
+
+/// #if WEBPACK
+// #code import sheet from './spanav.css?stylesheet';
+/// #else
+import sheet from './spanav.css' with { type: 'css' };
+/// #endif
+
 class SpaNavCe extends HTMLElement {
+	#tagNodes = [];
+
 	constructor() {
 		super();
 		// Attach a shadow root for style encapsulation
 		this.attachShadow( { mode: 'open' } );
-		this.shadowRoot.innerHTML = `
-			<style>
-				nav {
-					background-color: #008a8a;
-				}
-
-				nav {
-					margin: 0;
-					padding: 0;
-					display: flex;
-					height: 50px;
-					align-items: center;
-					/*justify-content: right; not used with nav :first-child*/
-				}
-
-				nav :first-child {
-					margin-right: auto; /* 1st li left, all remaining li to the right */
-				}
-
-				nav a, nav i {
-					display: inline-block;
-					padding: 1em 1.5em;
-					color: white;
-					text-decoration: none;
-					transition: background-color 0.3s ease;
-				}
-
-				nav a:hover {
-					background-color: transparent;
-				}
-
-				.fa-bars, .fa-home:hover {
-					cursor: pointer;
-				}
-
-				/* Dropdown container */
-				.dropdown {
-					position: relative;
-					/*display: inline-block;*/
-					margin-left: auto;
-					user-select: none;
-				}
-				/* Dropdown button */
-				.dropdown-button {
-					padding: 10px 20px;
-					background-color: #008a8a;
-					color: white;
-					cursor: pointer;
-					border: none;
-					border-radius: 4px;
-					font-size: 12px;
-				}
-				/* Dropdown menu */
-				.dropdown-menu {
-					position: absolute;
-					right: 0;
-					top: 100%;
-					min-width: 110px;
-					background-color: white;
-					border: 1px solid #ddd;
-					border-radius: 4px;
-					box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-					display: none;
-					z-index: 1000;
-				}
-				/* Show menu when active */
-				.dropdown-menu.show {
-					display: block;
-				}
-				/* Menu items */
-				.dropdown-menu a {
-					display: block;
-					padding: 10px 15px;
-					color: #333;
-					text-decoration: none;
-					cursor: pointer;
-				}
-				.dropdown-menu a:hover {
-					background-color: #f1f1f1;
-				}
-
-				.center {
-					justify-content: center;
-				}
-
-			</style>
-			<nav></nav>
-		`;
+		this.shadowRoot.adoptedStyleSheets = [sheet];
+		this.shadowRoot.innerHTML = `<nav></nav>`;
 	}
 
 	connectedCallback() {
 		setTimeout( () => this.#configure(), 0 );
 	}
 
+	get children(){ return this.#tagNodes.reduce( ( a, v ) => {
+		a[ v.id ] = v;
+		return a;
+		}, {} );
+	};
+
 	#configure(){
-		const tagNodes = [];
+		this.#tagNodes = [];
 		const nav = this.shadowRoot.querySelector( 'nav' );
-
 		let underlinedEl;
-		let currentEl = document.querySelector( 'div[data-spa="home"]' );
-		if( currentEl ) currentEl.classList.add( 'active' ); //.hidden = false;
+		const firstLink = this.querySelector( 'a, button' );
+    let currentEl = document.querySelector( `div[data-spa="${ firstLink.id }"]` );
+    currentEl.classList.add( 'active' );
 
-		for( const n of this.childNodes ){
-			if( n?.tagName ){
-				tagNodes.push( n );
-				n.addEventListener( 'click', ( e ) => {
-					e.preventDefault();
-					currentEl.classList.remove( 'active' ); //.hidden = true;
-					currentEl = document.querySelector( `div[data-spa="${ e.target.id }"]` );
-					currentEl.classList.add( 'active' ); //.hidden = false;
-					if( underlinedEl ) underlinedEl.style.textDecoration = '';
-					if( e.target.id !== 'home' ){
-						e.target.style.textDecoration = 'underline';
-						underlinedEl = e.target;
-					} else {
-						underlinedEl = undefined;
-					}
-				} );
-			}
+		for( const n of this.querySelectorAll( 'a, button' ) ){
+			this.#tagNodes.push( n );
+			if( n.tagName != 'A' ) continue;
+			n.addEventListener( 'click', ( e ) => {
+				e.preventDefault();
+				currentEl.classList.remove( 'active' );
+				document.querySelector('spa-nav').shadowRoot.getElementById(currentEl.dataset.spa).style.textDecoration = '';
+				currentEl = document.querySelector( `div[data-spa="${ e.target.id }"]` );
+				currentEl.classList.add( 'active' );
+				//if( underlinedEl ) underlinedEl.style.textDecoration = '';
+				if( e.target.id != firstLink.id ){
+					e.target.style.textDecoration = 'underline';
+					//underlinedEl = e.target;
+				//} else {
+					//underlinedEl = undefined;
+				}
+			} );
 		}
 
-		nav.appendChild( tagNodes.shift() );
-		if( tagNodes.length < 4 ){
-			for( const n of tagNodes ){ nav.appendChild( n ); };
+		nav.appendChild( this.#tagNodes.shift() );
+		if( this.#tagNodes.length < 4 ){
+			for( const n of this.#tagNodes ){ nav.appendChild( n ); };
 		} else {
 			nav.insertAdjacentHTML( 'beforeend', `
 				<div class="dropdown">
@@ -136,7 +65,7 @@ class SpaNavCe extends HTMLElement {
 				</div>
 			` );
 			const dropDownMenu = nav.querySelector( 'div.dropdown-menu' );
-			for( const n of tagNodes ){
+			for( const n of this.#tagNodes ){
 				dropDownMenu.appendChild( n );
 			};
 		}
