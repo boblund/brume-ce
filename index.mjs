@@ -1,5 +1,5 @@
 import { AuthenticationDetails, CognitoUserPool, CognitoUser } from 'amazon-cognito-identity-js';
-import brumeStyleSheet from './common.css?stylesheet' assert { type: "css" };
+import brumeStyleSheet from './common.css?stylesheet' with { type: "css" };
 import { SpaNavCe } from './spa-nav.mjs';
 
 export{ BrumeCallCe, BrumeLoginCe, DialogCe, SpaNavCe, brumeStyleSheet };
