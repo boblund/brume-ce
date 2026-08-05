@@ -2,6 +2,23 @@ import { AuthenticationDetails, CognitoUserPool, CognitoUser } from 'amazon-cogn
 import brumeStyleSheet from './common.css?stylesheet' with { type: "css" };
 import { SpaNavCe } from './spa-nav.mjs';
 
+function base64url(input) {
+  return btoa(input)
+    .replace(/=/g, "")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_");
+}
+
+function buildJwt(payload) {
+  const header = { alg: "none", typ: "JWT" };
+
+  const encodedHeader = base64url(JSON.stringify(header));
+  const encodedPayload = base64url(JSON.stringify(payload));
+
+  // "none" alg means an empty signature segment
+  return `${encodedHeader}.${encodedPayload}.`;
+}
+
 export{ BrumeCallCe, BrumeLoginCe, DialogCe, SpaNavCe, brumeStyleSheet };
 
 class BrumeLoginCe extends HTMLElement {
@@ -66,6 +83,13 @@ class BrumeLoginCe extends HTMLElement {
 			} else {
 				localStorage.email = "";
 				localStorage.checkbox = "";
+			}
+
+			if( window.LOCAL_BRUME ){
+				const payload = { 'custom:brume_name': this.#email.value };
+				const token = buildJwt( payload );
+				this.#loginCallback( { token } );
+				return;
 			}
 
 			const result = await this.#userPassAuth( this.#email.value, this.#password.value );
