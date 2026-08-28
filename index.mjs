@@ -85,7 +85,7 @@ class BrumeLoginCe extends HTMLElement {
 				localStorage.checkbox = "";
 			}
 
-			if( window.LOCAL_BRUME || await window?.localBrume?.() ){
+			if( window?.LOCAL_BRUME || await window?.localBrume?.() ){
 				const payload = { 'custom:brume_name': this.#email.value };
 				const token = buildJwt( payload );
 				this.#loginCallback( { token } );
